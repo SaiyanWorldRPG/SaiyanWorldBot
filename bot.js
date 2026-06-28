@@ -71,7 +71,6 @@ client.on("messageCreate", async (message) => {
             return message.reply("Tipo inválido. Use: item ou pokemon.");
         }
 
-        // Carrega o JSON
         const filePath = "./rewards.json";
         let data = {};
 
@@ -95,26 +94,31 @@ client.on("messageCreate", async (message) => {
     // ===============================
     if (message.content === "!rank") {
         try {
+            console.log("Chamando API:", RANKING_API_URL);
+
             const response = await axios.get(RANKING_API_URL);
             const data = response.data;
+
+            console.log("Resposta da API:", data);
 
             if (!data.players || Object.keys(data.players).length === 0) {
                 return message.reply("Ainda não há jogadores no ranking.");
             }
 
-            const players = Object.values(data.players);
-            players.sort((a, b) => b.score - a.score);
-
-            const top = players.slice(0, 10);
+            const players = Object.values(data.players)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 10);
 
             let text = "**🏆 RANKING GLOBAL — TOP 10**\n\n";
-            top.forEach((p, i) => {
+
+            players.forEach((p, i) => {
                 text += `**${i + 1}.** ${p.player_name} (${p.player_id}) — **${p.score}** pontos\n`;
             });
 
             message.reply(text);
+
         } catch (e) {
-            console.error("Erro ao buscar ranking:", e.message);
+            console.error("Erro ao buscar ranking:", e);
             message.reply("Não foi possível carregar o ranking agora.");
         }
     }
@@ -124,6 +128,14 @@ client.on("messageCreate", async (message) => {
     // ===============================
     if (message.content.startsWith("!me")) {
         try {
+            const args = message.content.split(" ");
+
+            if (args.length < 2) {
+                return message.reply("Uso correto: !me <PUBLIC_ID>");
+            }
+
+            const playerId = args[1];
+
             const response = await axios.get(RANKING_API_URL);
             const data = response.data;
 
@@ -131,12 +143,6 @@ client.on("messageCreate", async (message) => {
                 return message.reply("Ainda não há jogadores no ranking.");
             }
 
-            const args = message.content.split(" ");
-            if (args.length < 2) {
-                return message.reply("Uso correto: !me <PUBLIC_ID>");
-            }
-
-            const playerId = args[1];
             const player = data.players[playerId];
 
             if (!player) {
@@ -146,8 +152,9 @@ client.on("messageCreate", async (message) => {
             message.reply(
                 `Seu ranking:\nJogador: **${player.player_name}**\nID: **${player.player_id}**\nScore: **${player.score}**`
             );
+
         } catch (e) {
-            console.error("Erro ao buscar ranking:", e.message);
+            console.error("Erro ao buscar ranking:", e);
             message.reply("Não foi possível carregar seu ranking agora.");
         }
     }
