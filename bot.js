@@ -7,7 +7,9 @@ const fs = require("fs");
 // VARIÁVEIS DE AMBIENTE
 // ===============================
 const TOKEN = process.env.TOKEN;
-const RANKING_API_URL = process.env.RANKING_API_URL;
+
+// 🔥 URL CORRETA DA SUA API RAILWAY
+const RANKING_API_URL = "https://saiyanworld-rankingapi-production.up.railway.app/api/ranking";
 
 // ===============================
 // CONFIGURAÇÃO DO CLIENT
@@ -118,7 +120,7 @@ client.on("messageCreate", async (message) => {
             message.reply(text);
 
         } catch (e) {
-            console.error("Erro ao buscar ranking:", e);
+            console.error("Erro ao buscar ranking:", e.message);
             message.reply("Não foi possível carregar o ranking agora.");
         }
     }
@@ -154,7 +156,7 @@ client.on("messageCreate", async (message) => {
             );
 
         } catch (e) {
-            console.error("Erro ao buscar ranking:", e);
+            console.error("Erro ao buscar ranking:", e.message);
             message.reply("Não foi possível carregar seu ranking agora.");
         }
     }
